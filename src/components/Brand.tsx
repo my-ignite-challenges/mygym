@@ -8,6 +8,7 @@ export function Brand() {
     <>
       <Image
         source={backgroundImage}
+        defaultSource={backgroundImage}
         alt="People working out"
         resizeMode="contain"
         position="absolute"
