@@ -9,7 +9,7 @@ export function HomeHeader() {
     <HStack alignItems="center" bg="gray.600" pt={16} pb={5} px={8}>
       <Avatar
         source={{ uri: "https://github.com/georgewfsantos.png" }}
-        alt="User avatar"
+        alt="Imagem do usuário"
         size={16}
         mr={4}
       />

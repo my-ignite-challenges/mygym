@@ -20,7 +20,7 @@ export function ExerciseCard({ ...props }: Props) {
           source={{
             uri: "https://media.istockphoto.com/id/615883260/pt/foto/difficult-doesnt-mean-impossible.jpg?s=612x612&w=0&k=20&c=O6RRjj3CwOaNXkpmHOTZNdFUcTyZTuGImlNkgMMEFwY=",
           }}
-          alt="Exercise Image"
+          alt="Imagem de exercício"
           w={16}
           h={16}
           mr={4}
