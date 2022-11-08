@@ -1,3 +1,5 @@
+import { StatusBar } from "react-native";
+
 import { NativeBaseProvider } from "native-base";
 import {
   useFonts,
@@ -17,6 +19,11 @@ export default function App() {
 
   return (
     <NativeBaseProvider theme={theme}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       {fontsLoaded ? <Routes /> : <Loading />}
     </NativeBaseProvider>
   );
