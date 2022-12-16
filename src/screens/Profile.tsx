@@ -1,6 +1,7 @@
 import { useState } from "react";
 
-import { TouchableOpacity } from "react-native";
+import { ImageProps, TouchableOpacity } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 
 import {
   Center,
@@ -16,10 +17,37 @@ import { Button } from "@components/Button";
 import { Header } from "@components/Header";
 import { Input } from "@components/Input";
 
+import defaultAvatar from "@assets/avatar-default.png";
+
 const AVATAR_SIZE = 33;
 
 export function Profile() {
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
+  const [avatar, setUserAvatar] = useState("");
+
+  async function handleUserAvatarSelection() {
+    try {
+      setIsAvatarLoading(true);
+      const selectedPhoto = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      });
+
+      if (selectedPhoto.cancelled) {
+        return;
+      }
+
+      if (selectedPhoto.uri) {
+        setUserAvatar(selectedPhoto.uri);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsAvatarLoading(false);
+    }
+  }
 
   return (
     <VStack flex={1}>
@@ -36,13 +64,13 @@ export function Profile() {
             />
           ) : (
             <Avatar
-              source={{ uri: "https://github.com/georgewfsantos.png" }}
+              source={avatar ? { uri: avatar } : defaultAvatar}
               alt="Imagem do usuário"
               size={AVATAR_SIZE}
             />
           )}
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserAvatarSelection}>
             <Text
               color="green.500"
               fontWeight="bold"
