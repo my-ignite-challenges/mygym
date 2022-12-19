@@ -1,7 +1,8 @@
 import { useState } from "react";
 
-import { ImageProps, TouchableOpacity } from "react-native";
+import { Alert, ImageProps, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 
 import {
   Center,
@@ -9,6 +10,7 @@ import {
   ScrollView,
   Skeleton,
   Text,
+  useToast,
   VStack,
 } from "native-base";
 
@@ -25,6 +27,8 @@ export function Profile() {
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
   const [avatar, setUserAvatar] = useState("");
 
+  const toast = useToast();
+
   async function handleUserAvatarSelection() {
     try {
       setIsAvatarLoading(true);
@@ -40,6 +44,16 @@ export function Profile() {
       }
 
       if (selectedPhoto.uri) {
+        const photoInfo = await FileSystem.getInfoAsync(selectedPhoto.uri);
+
+        if (photoInfo.size && photoInfo.size / 1024 / 1024 > 5) {
+          return toast.show({
+            title:
+              "O tamanho da imagem selecionada excede o limite de 5MB. Selecione uma imagem menor.",
+            placement: "top",
+            bgColor: "red.500",
+          });
+        }
         setUserAvatar(selectedPhoto.uri);
       }
     } catch (error) {
