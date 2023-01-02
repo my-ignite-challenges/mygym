@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Alert, ImageProps, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
 
