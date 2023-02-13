@@ -1,3 +1,7 @@
+import { useState } from "react";
+
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useNavigation } from "@react-navigation/native";
 import {
   VStack,
   Center,
@@ -6,16 +10,13 @@ import {
   Alert,
   useToast,
 } from "native-base";
-
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useNavigation } from "@react-navigation/native";
 import { Controller, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 import { Input } from "@components/Input";
 import { Brand } from "@components/Brand";
 import { Button } from "@components/Button";
-
+import { useAuth } from "@hooks/useAuth";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 
@@ -40,7 +41,11 @@ const signUpSchema = yup.object({
 });
 
 export function SignUp() {
+  const [isSigningUp, setIsSigningUp] = useState(false);
+
   const { goBack } = useNavigation();
+
+  const { signIn } = useAuth();
 
   const toast = useToast();
 
@@ -54,8 +59,12 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: SignUpData) {
     try {
+      setIsSigningUp(true);
       await api.post("/users", { name, email, password });
+      await signIn(email, password);
     } catch (error) {
+      setIsSigningUp(false);
+
       const isAppError = error instanceof AppError;
 
       const toastTitle = isAppError
@@ -144,6 +153,7 @@ export function SignUp() {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isSigningUp}
           />
         </Center>
 
