@@ -1,5 +1,10 @@
 import { api } from "@services/api";
 import {
+  getTokenFromStorage,
+  removeTokenFromStorage,
+  saveTokenToStorage,
+} from "@storage/token";
+import {
   getUserDataFromStorage,
   removeUserDataFromStorage,
   saveUserDataToStorage,
@@ -11,6 +16,7 @@ export type User = {
   name: string;
   email: string;
   avatar: string;
+  token?: string;
 };
 
 export type AuthContextData = {
@@ -34,9 +40,12 @@ function AuthProvider({ children }: AuthProviderProps) {
     try {
       const { data } = await api.post("/sessions", { email, password });
 
-      if (data.user) {
+      if (data.user && data.token) {
         setUser(data.user);
         saveUserDataToStorage(data.user);
+        saveTokenToStorage(data.token);
+
+        api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
       }
     } catch (error) {
       console.log(error);
@@ -49,8 +58,10 @@ function AuthProvider({ children }: AuthProviderProps) {
       setIsStoredUserDataLoading(true);
       const loggedUser = await getUserDataFromStorage();
 
-      if (loggedUser) {
-        setUser(loggedUser);
+      const token = await getTokenFromStorage();
+
+      if (token && loggedUser) {
+        setUser({ ...loggedUser, token } as User);
       }
     } catch (error) {
       throw error;
@@ -63,6 +74,7 @@ function AuthProvider({ children }: AuthProviderProps) {
     try {
       setUser({} as User);
       await removeUserDataFromStorage();
+      await removeTokenFromStorage();
     } catch (error) {
       throw error;
     }

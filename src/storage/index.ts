@@ -1,3 +1,5 @@
 const USER = "@mygym:user";
 
-export { USER };
+const TOKEN = "@mygym:token";
+
+export { USER, TOKEN };
