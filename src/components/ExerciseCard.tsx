@@ -1,11 +1,16 @@
 import { TouchableOpacity, TouchableOpacityProps } from "react-native";
 
 import { Entypo } from "@expo/vector-icons";
-import { Heading, HStack, Image, Text, VStack, Icon } from "native-base";
+import { Heading, HStack, Image, Text, VStack, Icon, Box } from "native-base";
 
-type Props = TouchableOpacityProps & {};
+import { Exercise } from "@screens/Home";
+import { api } from "@services/api";
 
-export function ExerciseCard({ ...props }: Props) {
+type Props = TouchableOpacityProps & {
+  data: Exercise;
+};
+
+export function ExerciseCard({ data, ...props }: Props) {
   return (
     <TouchableOpacity {...props}>
       <HStack
@@ -18,7 +23,7 @@ export function ExerciseCard({ ...props }: Props) {
       >
         <Image
           source={{
-            uri: "https://media.istockphoto.com/id/615883260/pt/foto/difficult-doesnt-mean-impossible.jpg?s=612x612&w=0&k=20&c=O6RRjj3CwOaNXkpmHOTZNdFUcTyZTuGImlNkgMMEFwY=",
+            uri: `${api.defaults.baseURL}/exercise/thumb/${data.thumb}`,
           }}
           alt="Imagem de exercício"
           w={16}
@@ -28,10 +33,10 @@ export function ExerciseCard({ ...props }: Props) {
 
         <VStack flex={1}>
           <Heading color="white" fontSize="lg">
-            Remada unilateral
+            {data.name}
           </Heading>
           <Text color="white" fontSize="sm" mt={1} numberOfLines={2}>
-            3 Séries x 12 repetições
+            {data.series} Séries x {data.repetitions} repetições
           </Text>
         </VStack>
         <Icon as={Entypo} name="chevron-thin-right" color="gray.300" />
