@@ -18,6 +18,7 @@ import {
 import { Button } from "@components/Button";
 import { api } from "@services/api";
 import { Loading } from "@components/Loading";
+import { AppNavigatorRoutes } from "@routes/app.routes";
 import { AppError } from "@utils/AppError";
 import { Exercise as ExerciseProps } from "./Home";
 
@@ -31,9 +32,11 @@ type RouteParams = {
 
 export function Exercise() {
   const [isExerciseDataLoading, setIsExerciseDataLoading] = useState(false);
+  const [isBeingSubmittedToHistory, setIsBeingSubmittedToHistory] =
+    useState(false);
   const [exercise, setExercise] = useState<ExerciseProps>({} as ExerciseProps);
 
-  const { goBack } = useNavigation();
+  const { goBack, navigate } = useNavigation<AppNavigatorRoutes>();
   const route = useRoute();
   const toast = useToast();
 
@@ -58,6 +61,35 @@ export function Exercise() {
       });
     } finally {
       setIsExerciseDataLoading(false);
+    }
+  }
+
+  async function handleExerciseHistoryRegistration() {
+    try {
+      setIsBeingSubmittedToHistory(true);
+      const response = await api.post("/history", { exercise_id: exerciseId });
+
+      toast.show({
+        title: "O exercício foi adicionado ao histórico.",
+        placement: "top",
+        bgColor: "green.700",
+      });
+
+      navigate("History");
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+
+      const toastTitle = isAppError
+        ? error.message
+        : "Não foi possível adicionar a conclusão do exercício ao histórico.";
+
+      toast.show({
+        title: toastTitle,
+        placement: "top",
+        bgColor: "red.500",
+      });
+    } finally {
+      setIsBeingSubmittedToHistory(false);
     }
   }
 
@@ -126,7 +158,11 @@ export function Exercise() {
                 </Text>
               </HStack>
             </HStack>
-            <Button title="Marcar como realizado" />
+            <Button
+              title="Marcar como realizado"
+              isLoading={isBeingSubmittedToHistory}
+              onPress={handleExerciseHistoryRegistration}
+            />
           </Box>
         </VStack>
       )}
