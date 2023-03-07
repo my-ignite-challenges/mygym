@@ -41,10 +41,13 @@ function AuthProvider({ children }: AuthProviderProps) {
     try {
       const { data } = await api.post("/sessions", { email, password });
 
-      if (data.user && data.token) {
+      if (data.user && data.token && data.refresh_token) {
         setUser(data.user);
-        saveUserDataToStorage(data.user);
-        saveTokenToStorage(data.token);
+        await saveUserDataToStorage(data.user);
+        await saveTokenToStorage({
+          token: data.token,
+          refresh_token: data.refresh_token,
+        });
 
         api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
       }
@@ -59,10 +62,11 @@ function AuthProvider({ children }: AuthProviderProps) {
       setIsStoredUserDataLoading(true);
       const loggedUser = await getUserDataFromStorage();
 
-      const token = await getTokenFromStorage();
+      const { token, refresh_token } = await getTokenFromStorage();
 
       if (token && loggedUser) {
         setUser({ ...loggedUser, token } as User);
+        await saveTokenToStorage({ token, refresh_token });
       }
     } catch (error) {
       throw error;
@@ -93,6 +97,14 @@ function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     loadUserData();
   }, []);
+
+  useEffect(() => {
+    const subscribe = api.interceptTokenManagement(signOut);
+
+    return () => {
+      subscribe();
+    };
+  }, [signOut]);
 
   return (
     <AuthContext.Provider

@@ -11,8 +11,6 @@ import { Avatar } from "./Avatar";
 export function HomeHeader() {
   const { user, signOut } = useAuth();
 
-  console.log(user);
-
   return (
     <HStack alignItems="center" bg="gray.600" pt={16} pb={5} px={8}>
       <Avatar
